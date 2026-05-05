@@ -74,6 +74,7 @@ class RecurringTransactionRepository {
       transaction.startDate,
       transaction.endDate,
       transaction.nextDueDate,
+      transaction.isActive,
       transaction.id,
     ]);
   }

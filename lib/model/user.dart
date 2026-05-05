@@ -1,4 +1,6 @@
 // filepath: lib\model\user.dart
+import '../utils/type_converter.dart';
+
 class User {
   final int? id;
   final String name;
@@ -29,12 +31,12 @@ class User {
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'] as int?,
-      name: map['name'] as String,
-      email: map['email'] as String,
-      currency: map['currency'] as String,
-      monthlyIncome: (map['monthly_income'] as num).toDouble(),
-      password: map['password'] as String,
+      id: TypeConverter.toIntOrNull(map['id']),
+      name: TypeConverter.toStringi(map['name']),
+      email: TypeConverter.toStringi(map['email']),
+      currency: TypeConverter.toStringi(map['currency']),
+      monthlyIncome: TypeConverter.toDouble(map['monthly_income']),
+      password: TypeConverter.toStringi(map['password']),
     );
   }
 

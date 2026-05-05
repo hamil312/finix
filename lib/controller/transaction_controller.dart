@@ -1,12 +1,15 @@
 // filepath: lib\controller\transaction_controller.dart
 import '../model/transaction.dart';
+import '../model/recurring_transaction.dart';
 import '../repository/transaction_repository.dart';
+import '../repository/recurring_transaction_repository.dart';
 import '../repository/budget_repository.dart';
 import '../repository/sync_repository.dart';
 import '../utils/database_connection.dart';
 
 class TransactionController {
   final TransactionRepository _repository = TransactionRepository();
+  final RecurringTransactionRepository _recurringRepository = RecurringTransactionRepository();
   final BudgetRepository _budgetRepository = BudgetRepository();
   final SyncRepository _syncRepository = SyncRepository();
 
@@ -101,5 +104,45 @@ class TransactionController {
     }
 
     return expensesByCategory;
+  }
+
+  DateTime _calculateNextDueDate(DateTime current, RecurringFrequency frequency) {
+    switch (frequency) {
+      case RecurringFrequency.daily:
+        return current.add(const Duration(days: 1));
+      case RecurringFrequency.weekly:
+        return current.add(const Duration(days: 7));
+      case RecurringFrequency.biweekly:
+        return current.add(const Duration(days: 14));
+      case RecurringFrequency.monthly:
+        return DateTime(current.year, current.month + 1, current.day);
+      case RecurringFrequency.yearly:
+        return DateTime(current.year + 1, current.month, current.day);
+    }
+  }
+
+  Future<void> processRecurringTransactions(int userId) async {
+    final dueRecurrings = await _recurringRepository.getActiveByUserId(userId);
+    final today = DateTime.now();
+
+    for (var recurring in dueRecurrings) {
+      if (recurring.nextDueDate.isBefore(today) || recurring.nextDueDate.isAtSameMomentAs(today)) {
+        // Crear la transacción
+        await createTransaction(
+          userId: userId,
+          amount: recurring.amount,
+          description: recurring.description,
+          categoryId: recurring.categoryId,
+          date: recurring.nextDueDate,
+        );
+
+        // Calcular nueva next_due_date
+        final newNextDate = _calculateNextDueDate(recurring.nextDueDate, recurring.frequency);
+
+        // Actualizar el recurring
+        final updatedRecurring = recurring.copyWith(nextDueDate: newNextDate);
+        await _recurringRepository.update(updatedRecurring);
+      }
+    }
   }
 }

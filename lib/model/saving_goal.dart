@@ -1,4 +1,6 @@
 // filepath: lib\model\saving_goal.dart
+import '../utils/type_converter.dart';
+
 class SavingGoal {
   final int? id;
   final int userId;
@@ -29,12 +31,12 @@ class SavingGoal {
 
   factory SavingGoal.fromMap(Map<String, dynamic> map) {
     return SavingGoal(
-      id: map['id'] as int?,
-      userId: map['user_id'] as int,
-      name: map['name'] as String,
-      targetAmount: (map['target_amount'] as num).toDouble(),
-      currentAmount: (map['current_amount'] as num).toDouble(),
-      deadline: DateTime.parse(map['deadline'] as String),
+      id: TypeConverter.toIntOrNull(map['id']),
+      userId: TypeConverter.toInt(map['user_id']),
+      name: TypeConverter.toStringi(map['name']),
+      targetAmount: TypeConverter.toDouble(map['target_amount']),
+      currentAmount: TypeConverter.toDouble(map['current_amount']),
+      deadline: TypeConverter.toDateTime(map['deadline']),
     );
   }
 

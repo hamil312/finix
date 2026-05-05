@@ -18,7 +18,7 @@ class DatabaseConnection {
   DatabaseConnection._() {
     // Cargar configuración desde .env
     host = dotenv.env['DB_HOST'] ?? 'localhost';
-    port = int.tryParse(dotenv.env['DB_PORT'] ?? '5432') ?? 5432;
+    port = int.tryParse(dotenv.env['DB_PORT'] ?? '5433') ?? 5433;
     database = dotenv.env['DB_NAME'] ?? 'finanzapp';
     username = dotenv.env['DB_USER'] ?? 'postgres';
     password = dotenv.env['DB_PASSWORD'] ?? '';
@@ -64,7 +64,18 @@ class DatabaseConnection {
   Connection get connection => _connection;
 
   // Métodos genéricos para CRUD
+  Future<void> _ensureConnected() async {
+    if (!_isConnected) {
+      await connect();
+    }
+    if (!_isConnected) {
+      throw Exception('No se puede ejecutar la consulta porque la conexión a la base de datos no está abierta.');
+    }
+  }
+
   Future<List<Map<String, dynamic>>> query(String sql, [List<dynamic>? parameters]) async {
+    await _ensureConnected();
+
     final result = await _connection.execute(
       Sql.named(sql),
       parameters: parameters ?? [],
@@ -86,6 +97,8 @@ class DatabaseConnection {
   }
 
   Future<int> execute(String sql, [List<dynamic>? parameters]) async {
+    await _ensureConnected();
+
     final result = await _connection.execute(
       Sql.named(sql),
       parameters: parameters ?? [],

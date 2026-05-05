@@ -1,4 +1,6 @@
 // filepath: lib\model\transaction.dart
+import '../utils/type_converter.dart';
+
 class Transaction {
   final int? id;
   final int userId;
@@ -29,12 +31,12 @@ class Transaction {
 
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
-      id: map['id'] as int?,
-      userId: map['user_id'] as int,
-      amount: (map['amount'] as num).toDouble(),
-      date: DateTime.parse(map['date'] as String),
-      description: map['description'] as String,
-      categoryId: map['category_id'] as int,
+      id: TypeConverter.toIntOrNull(map['id']),
+      userId: TypeConverter.toInt(map['user_id']),
+      amount: TypeConverter.toDouble(map['amount']),
+      date: DateTime.parse((map['date'] ?? DateTime.now().toIso8601String()).toString()),
+      description: TypeConverter.toStringi(map['description']),
+      categoryId: TypeConverter.toInt(map['category_id']),
     );
   }
 

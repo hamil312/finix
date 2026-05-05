@@ -1,4 +1,6 @@
 // filepath: lib\model\category.dart
+import '../utils/type_converter.dart';
+
 class Category {
   final int? id;
   final String name;
@@ -23,10 +25,10 @@ class Category {
 
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
-      id: map['id'] as int?,
-      name: map['name'] as String,
-      type: map['type'] as String,
-      defaultAllocationPercent: (map['default_allocation_percent'] as num).toDouble(),
+      id: TypeConverter.toIntOrNull(map['id']),
+      name: TypeConverter.toStringi(map['name']),
+      type: TypeConverter.toStringi(map['type']),
+      defaultAllocationPercent: TypeConverter.toDouble(map['default_allocation_percent']),
     );
   }
 

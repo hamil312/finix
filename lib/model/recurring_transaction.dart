@@ -1,5 +1,6 @@
 // filepath: lib\model\recurring_transaction.dart
 import 'transaction.dart';
+import '../utils/type_converter.dart';
 
 enum RecurringFrequency { daily, weekly, biweekly, monthly, yearly }
 
@@ -8,6 +9,7 @@ class RecurringTransaction extends Transaction {
   final DateTime startDate;
   final DateTime? endDate;
   final DateTime nextDueDate;
+  final bool isActive;
 
   RecurringTransaction({
     super.id,
@@ -20,6 +22,7 @@ class RecurringTransaction extends Transaction {
     required this.startDate,
     this.endDate,
     required this.nextDueDate,
+    this.isActive = true,
   });
 
   @override
@@ -30,25 +33,27 @@ class RecurringTransaction extends Transaction {
       'start_date': startDate.toIso8601String(),
       'end_date': endDate?.toIso8601String(),
       'next_due_date': nextDueDate.toIso8601String(),
+      'is_active': isActive,
     };
   }
 
   factory RecurringTransaction.fromMap(Map<String, dynamic> map) {
     return RecurringTransaction(
-      id: map['id'] as int?,
-      userId: map['user_id'] as int,
-      amount: (map['amount'] as num).toDouble(),
-      date: DateTime.parse(map['date'] as String),
-      description: map['description'] as String,
-      categoryId: map['category_id'] as int,
+      id: TypeConverter.toIntOrNull(map['id']),
+      userId: TypeConverter.toInt(map['user_id']),
+      amount: TypeConverter.toDouble(map['amount']),
+      date: DateTime.parse((map['date'] ?? DateTime.now().toIso8601String()).toString()),
+      description: TypeConverter.toStringi(map['description']),
+      categoryId: TypeConverter.toInt(map['category_id']),
       frequency: RecurringFrequency.values.firstWhere(
         (e) => e.name == map['frequency'],
       ),
-      startDate: DateTime.parse(map['start_date'] as String),
+      startDate: DateTime.parse((map['start_date'] ?? DateTime.now().toIso8601String()).toString()),
       endDate: map['end_date'] != null 
-          ? DateTime.parse(map['end_date'] as String) 
+          ? DateTime.parse(map['end_date'].toString()) 
           : null,
-      nextDueDate: DateTime.parse(map['next_due_date'] as String),
+      nextDueDate: DateTime.parse((map['next_due_date'] ?? DateTime.now().toIso8601String()).toString()),
+      isActive: map['is_active'] as bool? ?? true,
     );
   }
 
@@ -64,6 +69,7 @@ class RecurringTransaction extends Transaction {
     DateTime? startDate,
     DateTime? endDate,
     DateTime? nextDueDate,
+    bool? isActive,
   }) {
     return RecurringTransaction(
       id: id ?? this.id,
@@ -76,6 +82,7 @@ class RecurringTransaction extends Transaction {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       nextDueDate: nextDueDate ?? this.nextDueDate,
+      isActive: isActive ?? this.isActive,
     );
   }
 }
