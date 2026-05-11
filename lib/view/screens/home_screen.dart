@@ -7,6 +7,7 @@ import '../../controller/transaction_controller.dart';
 import '../../controller/debt_controller.dart';
 import '../../controller/saving_goal_controller.dart';
 import 'expense_screen.dart';
+import 'debt_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _debtController = DebtController();
     _savingGoalController = SavingGoalController();
     _loadDashboardData();
+    _rescheduleDebtReminders();
   }
 
   Future<void> _loadDashboardData() async {
@@ -75,6 +77,16 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error cargando datos: $e');
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _rescheduleDebtReminders() async {
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (userId == null) return;
+    try {
+      await DebtController().rescheduleAllReminders(userId);
+    } catch (e) {
+      print('⚠️ No se pudieron reprogramar recordatorios: $e');
     }
   }
 
@@ -220,6 +232,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ExpenseScreen()),
+            );
+            break;
+          case 'Deudas':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DebtScreen()),
             );
             break;
           default:

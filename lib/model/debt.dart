@@ -35,10 +35,12 @@ class Debt {
       id: map['id'] as int?,
       userId: map['user_id'] as int,
       name: map['name'] as String,
-      total: (map['total'] as num).toDouble(),
-      remaining: (map['remaining'] as num).toDouble(),
-      interestRate: (map['interest_rate'] as num).toDouble(),
-      dueDate: DateTime.parse(map['due_date'] as String),
+      // ANTES: (map['total'] as num).toDouble()
+      // DESPUÉS: parseo seguro desde String o num
+      total: _toDouble(map['total']),
+      remaining: _toDouble(map['remaining']),
+      interestRate: _toDouble(map['interest_rate']),
+      dueDate: DateTime.parse(map['due_date'].toString()),
     );
   }
 
@@ -60,6 +62,13 @@ class Debt {
       interestRate: interestRate ?? this.interestRate,
       dueDate: dueDate ?? this.dueDate,
     );
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 
   double get paidAmount => total - remaining;

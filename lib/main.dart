@@ -5,13 +5,16 @@ import 'utils/database_connection.dart';
 import 'provider/auth_provider.dart';
 import 'view/screens/auth_screen.dart';
 import 'view/screens/home_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Cargar variables de entorno
   await dotenv.load(fileName: '.env');
-  
+
+  await NotificationService().initialize();
+
   // Inicializar conexión a PostgreSQL
   try {
     await DatabaseConnection.instance.connect();
@@ -25,7 +28,7 @@ void main() async {
     print('   - La app funcionará en modo offline por ahora');
     print('Error: $e');
   }
-  
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthProvider()..restoreSession(),
@@ -48,13 +51,14 @@ class MyApp extends StatelessWidget {
       ),
       home: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
-          return authProvider.isAuthenticated ? const HomeScreen() : const AuthScreen();
+          return authProvider.isAuthenticated
+              ? const HomeScreen()
+              : const AuthScreen();
         },
       ),
     );
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -104,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(widget.title), 
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
