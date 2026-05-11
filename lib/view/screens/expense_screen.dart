@@ -50,12 +50,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> with SingleTickerProvider
     try {
       final transactions = await transactionController.getUserTransactions(userId);
       final recurring = await recurringController.getUserRecurringTransactions(userId);
-      final categories = await categoryController.getAllCategories();
+      final categories = await categoryController.getExpenseCategoriesForUser(userId);
 
       setState(() {
         _transactions = transactions.where((t) => t.amount < 0).toList(); // Solo gastos
         _recurringTransactions = recurring;
-        _categories = categories.where((c) => c.type == 'expense').toList();
+        _categories = categories;
         _isLoading = false;
       });
     } catch (e) {

@@ -8,6 +8,7 @@ import '../../controller/debt_controller.dart';
 import '../../controller/saving_goal_controller.dart';
 import 'expense_screen.dart';
 import 'debt_screen.dart';
+import 'budget_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -238,6 +239,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const DebtScreen()),
+            );
+            break;
+          case 'Presupuestos':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BudgetScreen()),
             );
             break;
           default:
